@@ -23,14 +23,23 @@ def save_tasks():
 
 def add_task():
     """Add a new task."""
-    task = input("Enter a task: ").strip()
-    if not task:
+    title = input("Enter a task: ").strip()
+    if not title:
         print("Task cannot be empty.")
         return
+
+    new_id = tasks[-1]["id"] + 1 if tasks else 1
+
+    task = {
+        "id": new_id,
+        "title": title,
+        "status": "pending"
+    }
 
     tasks.append(task)
     save_tasks()
     print("Task added successfully!")
+
 
 
 def list_tasks():
@@ -40,28 +49,30 @@ def list_tasks():
         return
 
     print("Your tasks:")
-    for i, task in enumerate(tasks, start=1):
-        print(f"{i}. {task}")
+    for task in tasks:
+        status = "✔" if task["status"] == "done" else "✗"
+        print(f'{task["id"]}. {task["title"]} [{status}]')
+
 
 
 def delete_task():
-    """Delete a task by its number."""
+    """Delete a task by ID."""
     if not tasks:
         print("No tasks to delete.")
         return
 
     list_tasks()
     try:
-        task_num = int(input("Enter task number to delete: "))
-        if 1 <= task_num <= len(tasks):
-            removed = tasks.pop(task_num - 1)
-            save_tasks()
-            print(f"Deleted task: {removed}")
-        else:
-            print("Invalid task number.")
+        task_id = int(input("Enter task ID to delete: "))
+        for task in tasks:
+            if task["id"] == task_id:
+                tasks.remove(task)
+                save_tasks()
+                print(f'Deleted task: {task["title"]}')
+                return
+        print("Task ID not found.")
     except ValueError:
         print("Please enter a valid number.")
-
 
 def main():
     """Main menu loop."""
